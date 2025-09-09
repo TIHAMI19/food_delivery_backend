@@ -29,6 +29,8 @@ import couponRoutes from "./routes/coupons.js";
 dotenv.config()
 
 const app = express()
+
+app.set("trust proxy", true)
 const httpServer = http.createServer(app)
 const PORT = process.env.PORT || 5000
 
