@@ -1,0 +1,702 @@
+import mongoose from "mongoose"
+import dotenv from "dotenv"
+import User from "../models/User.js"
+import Restaurant from "../models/Restaurant.js"
+import MenuItem from "../models/MenuItem.js"
+import Order from "../models/Order.js"
+
+dotenv.config()
+
+const seedData = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/food-delivery")
+    console.log("Connected to MongoDB")
+
+    // Clear existing data
+    await User.deleteMany({})
+    await Restaurant.deleteMany({})
+    await MenuItem.deleteMany({})
+    await Order.deleteMany({})
+
+    const users = await User.create([
+      // Customers
+      {
+        name: "John Customer",
+        email: "customer@example.com",
+        password: "password123",
+        role: "customer",
+        phone: "+1234567890",
+        address: {
+          street: "123 Main St",
+          city: "New York",
+          state: "NY",
+          zipCode: "10001",
+          coordinates: { lat: 40.7128, lng: -74.006 },
+        },
+      },
+      {
+        name: "Sarah Johnson",
+        email: "sarah@example.com",
+        password: "password123",
+        role: "customer",
+        phone: "+1234567895",
+        address: {
+          street: "456 Oak Avenue",
+          city: "New York",
+          state: "NY",
+          zipCode: "10002",
+          coordinates: { lat: 40.7589, lng: -73.9851 },
+        },
+      },
+      {
+        name: "Mike Chen",
+        email: "mike@example.com",
+        password: "password123",
+        role: "customer",
+        phone: "+1234567896",
+        address: {
+          street: "789 Pine Street",
+          city: "New York",
+          state: "NY",
+          zipCode: "10003",
+          coordinates: { lat: 40.7505, lng: -73.9934 },
+        },
+      },
+
+      // Restaurant Owners
+      {
+        name: "Restaurant Owner",
+        email: "owner@example.com",
+        password: "password123",
+        role: "restaurant_owner",
+        phone: "+1234567891",
+      },
+      {
+        name: "Maria Rodriguez",
+        email: "maria@example.com",
+        password: "password123",
+        role: "restaurant_owner",
+        phone: "+1234567897",
+      },
+      {
+        name: "David Kim",
+        email: "david@example.com",
+        password: "password123",
+        role: "restaurant_owner",
+        phone: "+1234567898",
+      },
+
+      // Riders
+      {
+        name: "Alex Rider",
+        email: "rider1@example.com",
+        password: "password123",
+        role: "rider",
+        phone: "+1234567899",
+        riderInfo: {
+          vehicleType: "motorcycle",
+          vehicleNumber: "ABC123",
+          licenseNumber: "DL123456789",
+          isAvailable: true,
+          currentLocation: { lat: 40.7128, lng: -74.006 },
+          deliveryStats: {
+            totalDeliveries: 156,
+            averageRating: 4.8,
+            totalEarnings: 2340.5,
+          },
+        },
+      },
+      {
+        name: "Emma Wilson",
+        email: "rider2@example.com",
+        password: "password123",
+        role: "rider",
+        phone: "+1234567800",
+        riderInfo: {
+          vehicleType: "bicycle",
+          vehicleNumber: "N/A",
+          licenseNumber: "DL987654321",
+          isAvailable: true,
+          currentLocation: { lat: 40.7589, lng: -73.9851 },
+          deliveryStats: {
+            totalDeliveries: 89,
+            averageRating: 4.6,
+            totalEarnings: 1245.75,
+          },
+        },
+      },
+      {
+        name: "Carlos Martinez",
+        email: "rider3@example.com",
+        password: "password123",
+        role: "rider",
+        phone: "+1234567801",
+        riderInfo: {
+          vehicleType: "car",
+          vehicleNumber: "XYZ789",
+          licenseNumber: "DL456789123",
+          isAvailable: false,
+          currentLocation: { lat: 40.7505, lng: -73.9934 },
+          deliveryStats: {
+            totalDeliveries: 203,
+            averageRating: 4.9,
+            totalEarnings: 3120.25,
+          },
+        },
+      },
+
+      // Admin
+      {
+        name: "Admin User",
+        email: "admin@example.com",
+        password: "password123",
+        role: "admin",
+        phone: "+1234567892",
+      },
+    ])
+
+    console.log("Users created")
+
+    const restaurants = await Restaurant.create([
+      {
+        name: "Mario's Italian Kitchen",
+        description: "Authentic Italian cuisine with fresh ingredients and traditional recipes",
+        owner: users[3]._id,
+        cuisine: ["Italian"],
+        address: {
+          street: "456 Restaurant Ave",
+          city: "New York",
+          state: "NY",
+          zipCode: "10002",
+          coordinates: { lat: 40.7589, lng: -73.9851 },
+        },
+        phone: "+1234567893",
+        email: "mario@example.com",
+        rating: 4.5,
+        totalReviews: 127,
+        priceRange: "$$",
+        deliveryTime: { min: 25, max: 40 },
+        deliveryFee: 2.99,
+        minimumOrder: 15.0,
+        operatingHours: {
+          monday: { open: "11:00", close: "22:00" },
+          tuesday: { open: "11:00", close: "22:00" },
+          wednesday: { open: "11:00", close: "22:00" },
+          thursday: { open: "11:00", close: "22:00" },
+          friday: { open: "11:00", close: "23:00" },
+          saturday: { open: "11:00", close: "23:00" },
+          sunday: { open: "12:00", close: "21:00" },
+        },
+      },
+      {
+        name: "Dragon Palace",
+        description: "Traditional Chinese dishes with modern presentation",
+        owner: users[4]._id,
+        cuisine: ["Chinese"],
+        address: {
+          street: "789 Food Street",
+          city: "New York",
+          state: "NY",
+          zipCode: "10003",
+          coordinates: { lat: 40.7505, lng: -73.9934 },
+        },
+        phone: "+1234567894",
+        email: "dragon@example.com",
+        rating: 4.2,
+        totalReviews: 89,
+        priceRange: "$",
+        deliveryTime: { min: 20, max: 35 },
+        deliveryFee: 1.99,
+        minimumOrder: 12.0,
+        operatingHours: {
+          monday: { open: "11:00", close: "22:00" },
+          tuesday: { open: "11:00", close: "22:00" },
+          wednesday: { open: "11:00", close: "22:00" },
+          thursday: { open: "11:00", close: "22:00" },
+          friday: { open: "11:00", close: "23:00" },
+          saturday: { open: "11:00", close: "23:00" },
+          sunday: { open: "12:00", close: "21:00" },
+        },
+      },
+      {
+        name: "Spice Garden",
+        description: "Authentic Indian cuisine with aromatic spices and traditional cooking methods",
+        owner: users[4]._id,
+        cuisine: ["Indian"],
+        address: {
+          street: "321 Curry Lane",
+          city: "New York",
+          state: "NY",
+          zipCode: "10004",
+          coordinates: { lat: 40.7282, lng: -74.0776 },
+        },
+        phone: "+1234567802",
+        email: "spice@example.com",
+        rating: 4.7,
+        totalReviews: 156,
+        priceRange: "$$",
+        deliveryTime: { min: 30, max: 45 },
+        deliveryFee: 3.49,
+        minimumOrder: 18.0,
+        operatingHours: {
+          monday: { open: "12:00", close: "22:00" },
+          tuesday: { open: "12:00", close: "22:00" },
+          wednesday: { open: "12:00", close: "22:00" },
+          thursday: { open: "12:00", close: "22:00" },
+          friday: { open: "12:00", close: "23:00" },
+          saturday: { open: "12:00", close: "23:00" },
+          sunday: { open: "12:00", close: "21:00" },
+        },
+      },
+      {
+        name: "Burger Junction",
+        description: "Gourmet burgers made with premium ingredients and artisan buns",
+        owner: users[5]._id,
+        cuisine: ["American"],
+        address: {
+          street: "654 Burger Blvd",
+          city: "New York",
+          state: "NY",
+          zipCode: "10005",
+          coordinates: { lat: 40.7061, lng: -74.0087 },
+        },
+        phone: "+1234567803",
+        email: "burger@example.com",
+        rating: 4.3,
+        totalReviews: 203,
+        priceRange: "$$",
+        deliveryTime: { min: 15, max: 25 },
+        deliveryFee: 2.49,
+        minimumOrder: 10.0,
+        operatingHours: {
+          monday: { open: "10:00", close: "23:00" },
+          tuesday: { open: "10:00", close: "23:00" },
+          wednesday: { open: "10:00", close: "23:00" },
+          thursday: { open: "10:00", close: "23:00" },
+          friday: { open: "10:00", close: "24:00" },
+          saturday: { open: "10:00", close: "24:00" },
+          sunday: { open: "11:00", close: "22:00" },
+        },
+      },
+      {
+        name: "Sushi Zen",
+        description: "Fresh sushi and Japanese cuisine prepared by master chefs",
+        owner: users[5]._id,
+        cuisine: ["Japanese"],
+        address: {
+          street: "987 Sushi Street",
+          city: "New York",
+          state: "NY",
+          zipCode: "10006",
+          coordinates: { lat: 40.7411, lng: -74.0023 },
+        },
+        phone: "+1234567804",
+        email: "sushi@example.com",
+        rating: 4.8,
+        totalReviews: 98,
+        priceRange: "$$$",
+        deliveryTime: { min: 35, max: 50 },
+        deliveryFee: 4.99,
+        minimumOrder: 25.0,
+        operatingHours: {
+          monday: { open: "17:00", close: "22:00" },
+          tuesday: { open: "17:00", close: "22:00" },
+          wednesday: { open: "17:00", close: "22:00" },
+          thursday: { open: "17:00", close: "22:00" },
+          friday: { open: "17:00", close: "23:00" },
+          saturday: { open: "17:00", close: "23:00" },
+          sunday: { open: "17:00", close: "21:00" },
+        },
+      },
+    ])
+
+    console.log("Restaurants created")
+
+    const menuItems = await MenuItem.create([
+      // Mario's Italian Kitchen
+      {
+        name: "Margherita Pizza",
+        description: "Classic pizza with fresh mozzarella, tomato sauce, and basil",
+        restaurant: restaurants[0]._id,
+        category: "Main Course",
+        price: 16.99,
+        ingredients: ["Pizza dough", "Mozzarella", "Tomato sauce", "Fresh basil", "Olive oil"],
+        dietary: ["Vegetarian"],
+        preparationTime: 15,
+        rating: 4.6,
+        totalReviews: 45,
+      },
+      {
+        name: "Spaghetti Carbonara",
+        description: "Traditional Roman pasta with eggs, cheese, pancetta, and black pepper",
+        restaurant: restaurants[0]._id,
+        category: "Main Course",
+        price: 18.99,
+        ingredients: ["Spaghetti", "Eggs", "Pecorino Romano", "Pancetta", "Black pepper"],
+        preparationTime: 12,
+        rating: 4.8,
+        totalReviews: 32,
+      },
+      {
+        name: "Tiramisu",
+        description: "Classic Italian dessert with coffee-soaked ladyfingers and mascarpone",
+        restaurant: restaurants[0]._id,
+        category: "Desserts",
+        price: 7.99,
+        ingredients: ["Ladyfingers", "Mascarpone", "Coffee", "Cocoa powder", "Sugar"],
+        dietary: ["Vegetarian"],
+        preparationTime: 5,
+        rating: 4.7,
+        totalReviews: 28,
+      },
+      {
+        name: "Caesar Salad",
+        description: "Crisp romaine lettuce with parmesan, croutons, and Caesar dressing",
+        restaurant: restaurants[0]._id,
+        category: "Appetizers",
+        price: 12.99,
+        ingredients: ["Romaine lettuce", "Parmesan", "Croutons", "Caesar dressing"],
+        dietary: ["Vegetarian"],
+        preparationTime: 8,
+        rating: 4.2,
+        totalReviews: 18,
+      },
+
+      // Dragon Palace
+      {
+        name: "Sweet and Sour Pork",
+        description: "Crispy pork with bell peppers and pineapple in sweet and sour sauce",
+        restaurant: restaurants[1]._id,
+        category: "Main Course",
+        price: 14.99,
+        ingredients: ["Pork", "Bell peppers", "Pineapple", "Sweet and sour sauce"],
+        preparationTime: 18,
+        rating: 4.3,
+        totalReviews: 21,
+      },
+      {
+        name: "Kung Pao Chicken",
+        description: "Spicy stir-fried chicken with peanuts and vegetables",
+        restaurant: restaurants[1]._id,
+        category: "Main Course",
+        price: 13.99,
+        ingredients: ["Chicken", "Peanuts", "Bell peppers", "Chili peppers", "Soy sauce"],
+        spiceLevel: "Hot",
+        preparationTime: 15,
+        rating: 4.4,
+        totalReviews: 19,
+      },
+      {
+        name: "Vegetable Spring Rolls",
+        description: "Crispy rolls filled with fresh vegetables, served with sweet chili sauce",
+        restaurant: restaurants[1]._id,
+        category: "Appetizers",
+        price: 6.99,
+        ingredients: ["Cabbage", "Carrots", "Bean sprouts", "Spring roll wrapper"],
+        dietary: ["Vegetarian", "Vegan"],
+        preparationTime: 8,
+        rating: 4.1,
+        totalReviews: 15,
+      },
+      {
+        name: "Beef Lo Mein",
+        description: "Soft noodles stir-fried with tender beef and vegetables",
+        restaurant: restaurants[1]._id,
+        category: "Main Course",
+        price: 15.99,
+        ingredients: ["Lo mein noodles", "Beef", "Bok choy", "Bean sprouts", "Soy sauce"],
+        preparationTime: 20,
+        rating: 4.5,
+        totalReviews: 24,
+      },
+
+      // Spice Garden
+      {
+        name: "Chicken Tikka Masala",
+        description: "Tender chicken in creamy tomato-based curry sauce",
+        restaurant: restaurants[2]._id,
+        category: "Main Course",
+        price: 17.99,
+        ingredients: ["Chicken", "Tomatoes", "Cream", "Garam masala", "Onions"],
+        spiceLevel: "Medium",
+        preparationTime: 25,
+        rating: 4.7,
+        totalReviews: 67,
+      },
+      {
+        name: "Vegetable Biryani",
+        description: "Fragrant basmati rice with mixed vegetables and aromatic spices",
+        restaurant: restaurants[2]._id,
+        category: "Main Course",
+        price: 15.99,
+        ingredients: ["Basmati rice", "Mixed vegetables", "Saffron", "Biryani spices"],
+        dietary: ["Vegetarian", "Vegan"],
+        spiceLevel: "Mild",
+        preparationTime: 30,
+        rating: 4.5,
+        totalReviews: 43,
+      },
+      {
+        name: "Samosas",
+        description: "Crispy pastries filled with spiced potatoes and peas",
+        restaurant: restaurants[2]._id,
+        category: "Appetizers",
+        price: 8.99,
+        ingredients: ["Pastry", "Potatoes", "Peas", "Cumin", "Coriander"],
+        dietary: ["Vegetarian", "Vegan"],
+        preparationTime: 12,
+        rating: 4.3,
+        totalReviews: 29,
+      },
+      {
+        name: "Mango Lassi",
+        description: "Refreshing yogurt drink blended with sweet mango",
+        restaurant: restaurants[2]._id,
+        category: "Beverages",
+        price: 4.99,
+        ingredients: ["Yogurt", "Mango", "Sugar", "Cardamom"],
+        dietary: ["Vegetarian"],
+        preparationTime: 5,
+        rating: 4.6,
+        totalReviews: 35,
+      },
+
+      // Burger Junction
+      {
+        name: "Classic Cheeseburger",
+        description: "Juicy beef patty with cheese, lettuce, tomato, and special sauce",
+        restaurant: restaurants[3]._id,
+        category: "Main Course",
+        price: 12.99,
+        ingredients: ["Beef patty", "Cheese", "Lettuce", "Tomato", "Burger bun"],
+        preparationTime: 15,
+        rating: 4.4,
+        totalReviews: 89,
+      },
+      {
+        name: "BBQ Bacon Burger",
+        description: "Beef patty with crispy bacon, BBQ sauce, and onion rings",
+        restaurant: restaurants[3]._id,
+        category: "Main Course",
+        price: 15.99,
+        ingredients: ["Beef patty", "Bacon", "BBQ sauce", "Onion rings", "Burger bun"],
+        preparationTime: 18,
+        rating: 4.6,
+        totalReviews: 76,
+      },
+      {
+        name: "Sweet Potato Fries",
+        description: "Crispy sweet potato fries with garlic aioli dip",
+        restaurant: restaurants[3]._id,
+        category: "Sides",
+        price: 6.99,
+        ingredients: ["Sweet potatoes", "Garlic aioli", "Sea salt"],
+        dietary: ["Vegetarian"],
+        preparationTime: 12,
+        rating: 4.2,
+        totalReviews: 54,
+      },
+      {
+        name: "Chocolate Milkshake",
+        description: "Rich and creamy chocolate milkshake topped with whipped cream",
+        restaurant: restaurants[3]._id,
+        category: "Beverages",
+        price: 5.99,
+        ingredients: ["Ice cream", "Milk", "Chocolate syrup", "Whipped cream"],
+        dietary: ["Vegetarian"],
+        preparationTime: 5,
+        rating: 4.5,
+        totalReviews: 41,
+      },
+
+      // Sushi Zen
+      {
+        name: "Salmon Sashimi",
+        description: "Fresh Atlantic salmon sliced to perfection",
+        restaurant: restaurants[4]._id,
+        category: "Appetizers",
+        price: 18.99,
+        ingredients: ["Fresh salmon", "Wasabi", "Pickled ginger"],
+        preparationTime: 10,
+        rating: 4.9,
+        totalReviews: 34,
+      },
+      {
+        name: "California Roll",
+        description: "Crab, avocado, and cucumber wrapped in seaweed and rice",
+        restaurant: restaurants[4]._id,
+        category: "Main Course",
+        price: 12.99,
+        ingredients: ["Crab", "Avocado", "Cucumber", "Nori", "Sushi rice"],
+        preparationTime: 15,
+        rating: 4.3,
+        totalReviews: 67,
+      },
+      {
+        name: "Miso Soup",
+        description: "Traditional Japanese soup with tofu and seaweed",
+        restaurant: restaurants[4]._id,
+        category: "Appetizers",
+        price: 4.99,
+        ingredients: ["Miso paste", "Tofu", "Seaweed", "Green onions"],
+        dietary: ["Vegetarian"],
+        preparationTime: 5,
+        rating: 4.1,
+        totalReviews: 23,
+      },
+      {
+        name: "Green Tea Ice Cream",
+        description: "Creamy green tea flavored ice cream",
+        restaurant: restaurants[4]._id,
+        category: "Desserts",
+        price: 6.99,
+        ingredients: ["Green tea", "Cream", "Sugar"],
+        dietary: ["Vegetarian"],
+        preparationTime: 5,
+        rating: 4.4,
+        totalReviews: 19,
+      },
+    ])
+
+    console.log("Menu items created")
+
+    const orders = await Order.create([
+      {
+        orderNumber: "ORD001",
+        customer: users[0]._id,
+        restaurant: restaurants[0]._id,
+        items: [
+          { menuItem: menuItems[0]._id, quantity: 2, price: 16.99 },
+          { menuItem: menuItems[2]._id, quantity: 1, price: 7.99 },
+        ],
+        subtotal: 41.97,
+        deliveryFee: 2.99,
+        tax: 3.36,
+        total: 48.32,
+        deliveryAddress: {
+          street: "123 Main St",
+          city: "New York",
+          state: "NY",
+          zipCode: "10001",
+          coordinates: { lat: 40.7128, lng: -74.006 },
+        },
+        status: "delivered",
+        estimatedDeliveryTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 40 * 60 * 1000),
+        actualDeliveryTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 45 * 60 * 1000),
+        paymentMethod: "credit_card",
+        paymentStatus: "paid",
+      },
+      {
+        orderNumber: "ORD002",
+        customer: users[1]._id,
+        restaurant: restaurants[1]._id,
+        items: [
+          { menuItem: menuItems[4]._id, quantity: 1, price: 14.99 },
+          { menuItem: menuItems[6]._id, quantity: 2, price: 6.99 },
+        ],
+        subtotal: 28.97,
+        deliveryFee: 1.99,
+        tax: 2.48,
+        total: 33.44,
+        deliveryAddress: {
+          street: "456 Oak Avenue",
+          city: "New York",
+          state: "NY",
+          zipCode: "10002",
+          coordinates: { lat: 40.7589, lng: -73.9851 },
+        },
+        status: "out_for_delivery",
+        estimatedDeliveryTime: new Date(Date.now() + 15 * 60 * 1000),
+        paymentMethod: "paypal",
+        paymentStatus: "paid",
+      },
+      {
+        orderNumber: "ORD003",
+        customer: users[2]._id,
+        restaurant: restaurants[2]._id,
+        items: [
+          { menuItem: menuItems[8]._id, quantity: 1, price: 17.99 },
+          { menuItem: menuItems[10]._id, quantity: 1, price: 8.99 },
+        ],
+        subtotal: 26.98,
+        deliveryFee: 3.49,
+        tax: 2.44,
+        total: 32.91,
+        deliveryAddress: {
+          street: "789 Pine Street",
+          city: "New York",
+          state: "NY",
+          zipCode: "10003",
+          coordinates: { lat: 40.7505, lng: -73.9934 },
+        },
+        status: "preparing",
+        estimatedDeliveryTime: new Date(Date.now() + 30 * 60 * 1000),
+        paymentMethod: "cash",
+        paymentStatus: "pending",
+      },
+      {
+        orderNumber: "ORD004",
+        customer: users[0]._id,
+        restaurant: restaurants[3]._id,
+        items: [
+          { menuItem: menuItems[12]._id, quantity: 1, price: 12.99 },
+          { menuItem: menuItems[14]._id, quantity: 1, price: 6.99 },
+        ],
+        subtotal: 19.98,
+        deliveryFee: 2.49,
+        tax: 1.8,
+        total: 24.27,
+        deliveryAddress: {
+          street: "123 Main St",
+          city: "New York",
+          state: "NY",
+          zipCode: "10001",
+          coordinates: { lat: 40.7128, lng: -74.006 },
+        },
+        status: "pending",
+        estimatedDeliveryTime: new Date(Date.now() + 25 * 60 * 1000),
+        paymentMethod: "credit_card",
+        paymentStatus: "paid",
+      },
+      {
+        orderNumber: "ORD005",
+        customer: users[1]._id,
+        restaurant: restaurants[4]._id,
+        items: [
+          { menuItem: menuItems[16]._id, quantity: 1, price: 18.99 },
+          { menuItem: menuItems[17]._id, quantity: 2, price: 12.99 },
+        ],
+        subtotal: 44.97,
+        deliveryFee: 4.99,
+        tax: 4.0,
+        total: 53.96,
+        deliveryAddress: {
+          street: "456 Oak Avenue",
+          city: "New York",
+          state: "NY",
+          zipCode: "10002",
+          coordinates: { lat: 40.7589, lng: -73.9851 },
+        },
+        status: "cancelled",
+        estimatedDeliveryTime: new Date(Date.now() - 60 * 60 * 1000 + 50 * 60 * 1000),
+        paymentMethod: "debit_card",
+        paymentStatus: "refunded",
+      },
+    ])
+
+    console.log("Orders created")
+    console.log("Comprehensive seed data created successfully!")
+    console.log("\nTest Accounts:")
+    console.log("Customer: customer@example.com / password123")
+    console.log("Restaurant Owner: owner@example.com / password123")
+    console.log("Rider: rider1@example.com / password123")
+    console.log("Admin: admin@example.com / password123")
+
+    process.exit(0)
+  } catch (error) {
+    console.error("Error seeding data:", error)
+    process.exit(1)
+  }
+}
+
+seedData()

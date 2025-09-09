@@ -1,0 +1,29 @@
+{
+  "name": "food-delivery-backend",
+  "version": "1.0.0",
+  "description": "Food delivery system backend API",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node scripts/seed-data.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "express-validator": "^6.15.0",
+    "helmet": "^6.1.5",
+    "jsonwebtoken": "^9.0.0",
+  "mongoose": "^7.0.3",
+  "multer": "^1.4.5-lts.1",
+  "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

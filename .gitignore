@@ -1,0 +1,62 @@
+# Node / Express .gitignore
+
+# dependencies
+node_modules/
+jspm_packages/
+
+# runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# runtime config
+.env
+.env.local
+.env.*.local
+.npmrc
+
+# build / output
+dist/
+build/
+coverage/
+.nyc_output/
+lib-cov/
+*.tsbuildinfo
+
+# compiled binary addons
+build/Release/
+
+# editor / OS files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# temp
+tmp/
+temp/
+
+# test / debug
+.cache/
+.npm/
+.pnp.cjs
+.pnp.js
+.pnp.lock.cjs
+
+# PM2
+pm2.pid
+pm2.log
+
+# lockfiles (optional, uncomment if you don't want to commit)
+# package-lock.json
+# yarn.lock
